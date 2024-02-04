@@ -1,9 +1,35 @@
 "use client"
-
+import { useEffect, useState } from "react"
 import { Theme } from "@twilio-paste/core/theme"
+import type { Theme as AppTheme } from "@/app/components/ThemeToggle"
 
 export const Contexts: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  return <Theme.Provider theme={"twilio-dark"}>{children}</Theme.Provider>
+  const currTheme =
+    (typeof document === "object" &&
+      (document
+        .querySelector("html")
+        ?.getAttribute("data-theme") as AppTheme)) ||
+    "twilio"
+  const [theme, setTheme] = useState<AppTheme>(currTheme)
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "attributes") {
+          const theme = document
+            .querySelector("html")
+            ?.getAttribute("data-theme") as AppTheme
+          setTheme(theme)
+        }
+      })
+    })
+    observer.observe(document.querySelector("html") as Node, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    })
+  }, [])
+
+  return <Theme.Provider theme={theme}>{children}</Theme.Provider>
 }
