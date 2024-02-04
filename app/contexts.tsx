@@ -29,6 +29,8 @@ export const Contexts: React.FC<{ children: React.ReactNode }> = ({
       attributes: true,
       attributeFilter: ["data-theme"],
     })
+
+    return () => observer.disconnect()
   }, [])
 
   return <Theme.Provider theme={theme}>{children}</Theme.Provider>
